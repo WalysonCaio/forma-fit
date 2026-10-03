@@ -1,0 +1,28 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;
+create table auth.users(id uuid primary key,raw_user_meta_data jsonb);
+create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+grant usage on schema auth,storage,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;
+create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;grant select,insert,delete on storage.objects to authenticated;
+create function storage.foldername(name text) returns text[] language sql as $$ select string_to_array(name,'/') $$;`);
+await db.exec(readFileSync(new URL('../supabase.sql',import.meta.url),'utf8'));
+const ids=['10000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000003'];
+for(let i=0;i<3;i++)await db.query('insert into auth.users values($1,$2)',[ids[i],JSON.stringify({username:'person_'+i,name:'Person '+i})]);
+async function as(i,fn){await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${ids[i]}',false)`);try{return await fn()}finally{await db.exec('reset role')}}
+const ex=n=>Array.from({length:n},(_,i)=>({id:`ex${i}`,name:'Ex',sets:[{kg:10,reps:10,done:true}]}));
+await as(0,async()=>{assert.equal((await db.query('select * from public.profiles')).rows.length,1);await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',['40000000-0000-4000-8000-000000000004',ids[0],'workout',JSON.stringify({name:'Test',exercises:ex(2),qualified:true,finished_at:'1990-01-01'})]);const r=(await db.query('select * from public.records')).rows[0];assert.equal(r.data.qualified,false);assert.notEqual(r.data.finished_at,'1990-01-01');assert.equal((await db.query('select public.my_progress() as p')).rows[0].p.total,0)});
+await as(1,async()=>{assert.equal((await db.query('select * from public.records')).rows.length,0);assert.equal((await db.query('delete from public.records returning *')).rows.length,0);const people=(await db.query("select * from public.search_people('person')")).rows;assert.equal(people.length,2);assert.deepEqual(Object.keys(people[0]).sort(),['id','name','username']);});
+await as(0,async()=>{await db.query('update public.records set data=$1',[JSON.stringify({name:'Test',exercises:ex(3),finished_at:'1990-01-01'})]);const p=(await db.query('select public.my_progress() as p')).rows[0].p;assert.equal(p.total,1);assert.equal(p.today,true);assert.equal(p.streak,1);await db.query('insert into public.friendships(requester,recipient) values($1,$2)',[ids[0],ids[1]])});
+await as(0,async()=>{assert.equal((await db.query("update public.friendships set status='accepted' returning *")).rows.length,0)});
+await as(2,async()=>{assert.equal((await db.query('select * from public.friendships')).rows.length,0);assert.equal((await db.query('select public.friend_list() as f')).rows[0].f.length,0)});
+await as(1,async()=>{await db.exec("update public.friendships set status='accepted'");const l=(await db.query('select public.friend_list() as f')).rows[0].f;assert.equal(l.length,1);assert.equal(l[0].progress,null)});
+await as(0,async()=>await db.exec('update public.profiles set share_progress=true'));
+await as(1,async()=>{const l=(await db.query('select public.friend_list() as f')).rows[0].f;assert.equal(l[0].progress.total,1);assert.equal(l[0].progress.days,undefined);assert.equal((await db.query('select * from public.photos')).rows.length,0)});
+await as(0,async()=>{await db.query('insert into storage.objects(bucket_id,name) values($1,$2)',['progress',ids[0]+'/photo']);assert.equal((await db.query('select * from storage.objects')).rows.length,1);for(let i=0;i<21;i++){const ok=(await db.query('select public.use_ai_quota() as ok')).rows[0].ok;assert.equal(ok,i<20)}});
+await as(1,async()=>{assert.equal((await db.query('select * from storage.objects')).rows.length,0);assert.equal((await db.query('delete from storage.objects returning *')).rows.length,0)});
+console.log('PASS: migration, isolation, server streak, friendship consent, private storage and atomic AI quota');
+await db.close();
