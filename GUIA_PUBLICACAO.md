@@ -81,7 +81,7 @@ Mantenha a opção de confirmação segura do novo e-mail. Ative as notificaçõ
 2. Crie ou selecione um projeto e gere a chave Gemini.
 3. Restrinja a chave à Gemini API conforme as opções do Google Cloud/AI Studio.
 4. Confira se o modelo escolhido está disponível para sua conta e quais cotas/custos se aplicam.
-5. O valor inicial configurado é `gemini-2.5-flash`; você pode alterar `GEMINI_MODEL` no arquivo `wrangler.jsonc` e republicar. Não use um modelo TTS neste campo: a função espera geração de texto/JSON pelo endpoint `generateContent`.
+5. O valor inicial configurado é `gemini-3.5-flash-lite`; você pode alterar `GEMINI_MODEL` no arquivo `wrangler.jsonc` e republicar. Não use um modelo TTS neste campo: a função espera geração de texto/JSON pelo endpoint `generateContent`.
 
 O app limita a 20 **tentativas** diárias de IA por conta no banco, inclusive pedidos cujo serviço falhe, para controlar abuso. Isso não substitui orçamento/limites no Google Cloud. A voz desta versão é a leitura do navegador, sem custo de geração TTS do Gemini.
 
@@ -100,7 +100,7 @@ SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_ANON_KEY=CHAVE-ANON-LEGADA
 SUPABASE_SERVICE_ROLE_KEY=CHAVE-SERVICE-ROLE-LEGADA
 GEMINI_API_KEY=CHAVE-GEMINI
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
 Não coloque aspas extras se não forem necessárias. Salve e execute:

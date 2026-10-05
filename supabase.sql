@@ -8,7 +8,7 @@ create table public.profiles (
 );
 create table public.records (
  id uuid primary key, user_id uuid not null references auth.users(id) on delete cascade,
- kind text not null check(kind in ('routine','meal','pantry','measurement','draft','workout','taf_test','taf_plan','taf_session','run','run_draft','ai_proposal')),
+ kind text not null check(kind in ('routine','meal','pantry','measurement','draft','workout','taf_test','taf_plan','taf_session','run','run_draft','ai_proposal','food_item','food_log','water_log')),
  data jsonb not null, version integer not null default 1,
  updated_at timestamptz not null default now()
 );

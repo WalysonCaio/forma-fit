@@ -29,5 +29,9 @@ await db.exec(readFileSync(new URL('../ATUALIZACAO_1_1.sql',import.meta.url),'ut
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_1.sql',import.meta.url),'utf8'));
 await as(0,async()=>{for(const [i,kind] of ['taf_test','taf_plan','taf_session','run','run_draft','ai_proposal'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`50000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Novo',points:[{lat:-7,lon:-39}]})]);assert.equal((await db.query('select public.my_progress() as p')).rows[0].p.total,1);});
 await as(1,async()=>{assert.equal((await db.query("select * from public.records where kind in ('run','run_draft','taf_test')")).rows.length,0)});
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'utf8'));
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'utf8'));
+await as(0,async()=>{for(const [i,kind] of ['food_item','food_log','water_log'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`60000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Privado'})]);});
+await as(1,async()=>assert.equal((await db.query("select * from public.records where kind in ('food_item','food_log','water_log')")).rows.length,0));
 console.log('PASS: repeatable update preserves history; GPS and TAF rows isolated by RLS');
 await db.close();
