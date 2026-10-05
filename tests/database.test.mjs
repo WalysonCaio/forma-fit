@@ -33,5 +33,9 @@ await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'ut
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'utf8'));
 await as(0,async()=>{for(const [i,kind] of ['food_item','food_log','water_log'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`60000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Privado'})]);});
 await as(1,async()=>assert.equal((await db.query("select * from public.records where kind in ('food_item','food_log','water_log')")).rows.length,0));
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_4.sql',import.meta.url),'utf8'));
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_4.sql',import.meta.url),'utf8'));
+await as(0,async()=>db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',['70000000-0000-4000-8000-000000000001',ids[0],'notification',JSON.stringify({title:'Privada'})]));
+await as(1,async()=>assert.equal((await db.query("select * from public.records where kind='notification'")).rows.length,0));
 console.log('PASS: repeatable update preserves history; GPS and TAF rows isolated by RLS');
 await db.close();
