@@ -25,4 +25,9 @@ await as(1,async()=>{const l=(await db.query('select public.friend_list() as f')
 await as(0,async()=>{await db.query('insert into storage.objects(bucket_id,name) values($1,$2)',['progress',ids[0]+'/photo']);assert.equal((await db.query('select * from storage.objects')).rows.length,1);for(let i=0;i<21;i++){const ok=(await db.query('select public.use_ai_quota() as ok')).rows[0].ok;assert.equal(ok,i<20)}});
 await as(1,async()=>{assert.equal((await db.query('select * from storage.objects')).rows.length,0);assert.equal((await db.query('delete from storage.objects returning *')).rows.length,0)});
 console.log('PASS: migration, isolation, server streak, friendship consent, private storage and atomic AI quota');
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_1.sql',import.meta.url),'utf8'));
+await db.exec(readFileSync(new URL('../ATUALIZACAO_1_1.sql',import.meta.url),'utf8'));
+await as(0,async()=>{for(const [i,kind] of ['taf_test','taf_plan','taf_session','run','run_draft','ai_proposal'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`50000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Novo',points:[{lat:-7,lon:-39}]})]);assert.equal((await db.query('select public.my_progress() as p')).rows[0].p.total,1);});
+await as(1,async()=>{assert.equal((await db.query("select * from public.records where kind in ('run','run_draft','taf_test')")).rows.length,0)});
+console.log('PASS: repeatable update preserves history; GPS and TAF rows isolated by RLS');
 await db.close();

@@ -1,3 +1,5 @@
+> Já tem o Forma publicado? Use GUIA_ATUALIZACAO_1_1.md. Este guia abaixo é para instalação inicial.
+
 # Publicar o Forma: GitHub + Supabase + Cloudflare + Gemini
 
 Você receberá uma pasta `forma` dentro do ZIP. O código está pronto para configuração, mas o aplicativo ainda não está publicado na sua conta. GitHub guarda o código; Cloudflare hospeda a interface e a API; Supabase guarda contas/dados/fotos; Gemini responde aos pedidos autorizados.

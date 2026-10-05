@@ -1,8 +1,10 @@
-# Forma — treino e alimentação
+# Forma 1.1 — treino, TAF e corrida
 
 Aplicativo web pessoal com múltiplas contas, fichas ABC, registro de séries, alimentação, despensa, medidas, fotos privadas, amizades e auxiliar Gemini. Interface em português, adaptada ao celular. Instalável como PWA.
 
-**Comece pelo [GUIA_PUBLICACAO.md](GUIA_PUBLICACAO.md).**
+**Já publicou? Use [GUIA_ATUALIZACAO_1_1.md](GUIA_ATUALIZACAO_1_1.md) e execute apenas ATUALIZACAO_1_1.sql no banco existente.**
+
+Instalação inicial: [GUIA_PUBLICACAO.md](GUIA_PUBLICACAO.md).
 
 ## Executar
 
@@ -20,6 +22,18 @@ npm test
 npm run check
 npx wrangler deploy --dry-run
 ```
+
+## Novidades da 1.1
+
+- Mostrar/ocultar senha em todos os formulários. Troca de senha e redefinição de perfil protegidas no servidor.
+- Pausar/retomar musculação: tempo ativo e descanso congelados durante a pausa.
+- Propostas Gemini geradas após salvar contexto, com autorização configurável e revisão antes de aplicar. Propostas antigas são bloqueadas.
+- TAF: CRUD de metas do edital, resultados atuais, locais/dias disponíveis e agenda de preparação integrada em Hoje.
+- Corrida de rua com GPS, segmentos, filtros de sinal, pausa, rascunho e cartão PNG compartilhável. Esteira com distância manual.
+- Player oficial de YouTube persistente entre abas, carregado por ação explícita. Não sincroniza a sessão do YouTube Music.
+- Migração incremental preserva dados e políticas; percursos privados seguem RLS por usuário.
+
+GPS web exige aplicativo visível; segundo plano e tela bloqueada precisam de solução móvel nativa. Os testes usam posições simuladas; valide em seu celular.
 
 ## Implementado
 
