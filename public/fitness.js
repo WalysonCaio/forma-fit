@@ -15,3 +15,5 @@ export function acceptPosition(d,p){
  d.distance_m=(d.distance_m||0)+delta;d.points.push(p);if(d.points.length>600)d.points=d.points.filter((_,i)=>i%2===0||i===d.points.length-1);return true;
 }
 export function metTarget(test){if(test.type){const r=test.result;if(!r)return null;if(test.type==='bar')return r.reps>=test.min_reps;if(test.type==='abs')return r.reps>=test.min_reps&&r.time_s<=test.time_limit_s;if(test.type==='jump')return r.distance_m>=test.distance_m;return r.distance_m>=test.distance_m&&r.time_s<=test.time_limit_s;}if(test.current===null||test.current===undefined||test.current==='')return null;return test.comparison==='max'?Number(test.current)<=Number(test.target):Number(test.current)>=Number(test.target);}
+
+export function tafLocations(test,day){if(test.type==='run'){const choice=test.location==='Rua e esteira'?(test.day_locations?.[day]||'Rua e esteira'):test.location;return choice==='Rua e esteira'?['Rua','Esteira']:choice==='Academia'?['Esteira']:[choice];}return [test.location];}
