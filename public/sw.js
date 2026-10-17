@@ -1,4 +1,4 @@
-const CACHE='forma-shell-v5';const FILES=['/','/app.js','/data.js','/fitness.js','/nutrition.js','/style.css','/icon.svg','/manifest.webmanifest'];
+const CACHE='forma-shell-v6';const FILES=['/','/app.js','/data.js','/fitness.js','/exercises.js','/nutrition.js','/style.css','/icon.svg','/manifest.webmanifest'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
 self.addEventListener('message',e=>{if(e.data==='SKIP_WAITING')self.skipWaiting();});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));

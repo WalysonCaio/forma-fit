@@ -1,8 +1,8 @@
-# Forma 1.4 — treino, TAF e corrida
+# Forma 1.5 — treino, TAF e corrida
 
 Aplicativo web pessoal com múltiplas contas, fichas ABC, registro de séries, alimentação, despensa, medidas, fotos privadas, amizades e auxiliar Gemini. Interface em português, adaptada ao celular. Instalável como PWA.
 
-**Já publicou? Use [GUIA_ATUALIZACAO_1_4.md](GUIA_ATUALIZACAO_1_4.md). Execute ATUALIZACAO_1_4.sql no banco existente para aceitar notificações privadas.**
+**Já publicou? Use [GUIA_ATUALIZACAO_1_5.md](GUIA_ATUALIZACAO_1_5.md). Se já executou ATUALIZACAO_1_4.sql, não há novo SQL obrigatório. Veja também a correção de recuperação e SMTP no guia 1.5.**
 
 Instalação inicial: [GUIA_PUBLICACAO.md](GUIA_PUBLICACAO.md).
 

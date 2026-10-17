@@ -31,11 +31,18 @@ await as(0,async()=>{for(const [i,kind] of ['taf_test','taf_plan','taf_session',
 await as(1,async()=>{assert.equal((await db.query("select * from public.records where kind in ('run','run_draft','taf_test')")).rows.length,0)});
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'utf8'));
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_2.sql',import.meta.url),'utf8'));
-await as(0,async()=>{for(const [i,kind] of ['food_item','food_log','water_log'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`60000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Privado'})]);});
+await as(0,async()=>{for(const [i,kind] of ['food_item','food_log','water_log'].entries())await db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[`60000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,ids[0],kind,JSON.stringify({name:'Privado',...(kind==='workout'?{exercises:[]}: {})})]);});
 await as(1,async()=>assert.equal((await db.query("select * from public.records where kind in ('food_item','food_log','water_log')")).rows.length,0));
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_4.sql',import.meta.url),'utf8'));
 await db.exec(readFileSync(new URL('../ATUALIZACAO_1_4.sql',import.meta.url),'utf8'));
 await as(0,async()=>db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',['70000000-0000-4000-8000-000000000001',ids[0],'notification',JSON.stringify({title:'Privada'})]));
 await as(1,async()=>assert.equal((await db.query("select * from public.records where kind='notification'")).rows.length,0));
 console.log('PASS: repeatable update preserves history; GPS and TAF rows isolated by RLS');
+for(const [i,kind] of ['routine','meal','pantry','measurement','draft','workout','taf_test','taf_plan','taf_session','run','run_draft','ai_proposal','food_item','food_log','water_log','notification'].entries()){
+ const key=`90000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`;
+ await as(2,async()=>db.query('insert into public.records(id,user_id,kind,data) values($1,$2,$3,$4)',[key,ids[2],kind,JSON.stringify({name:'Privado',...(kind==='workout'?{exercises:[]}: {})})]));
+ await as(1,async()=>{assert.equal((await db.query('select * from public.records where id=$1',[key])).rows.length,0);assert.equal((await db.query("update public.records set data='{\"name\":\"Invadido\"}' where id=$1 returning *",[key])).rows.length,0);assert.equal((await db.query('delete from public.records where id=$1 returning *',[key])).rows.length,0);});
+ await as(2,async()=>{const r=(await db.query("update public.records set data=data || '{\"name\":\"Editado\"}' where id=$1 returning *",[key])).rows[0];assert.equal(r.version,2);assert.equal((await db.query('delete from public.records where id=$1 returning *',[key])).rows.length,1);});
+}
+console.log('PASS: CRUD and cross-user read/update/delete isolation for every record kind');
 await db.close();
